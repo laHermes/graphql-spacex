@@ -1,35 +1,28 @@
-import React from 'react';
-import { Query, gql } from '@apollo/client';
-
+import React, { Fragment } from 'react';
+import { gql, useQuery } from '@apollo/client';
+import LaunchItem from './LaunchItem';
 const LAUNCHES_QUERY = gql`
-query LaunchesQuery{
-    launches{
-        flight_number
-        mission_name
-        launch_date_local
-        launch_success
-    }}
-    `;
+	query LaunchesQuery {
+		launches {
+			flight_number
+			mission_name
+			launch_date_local
+			launch_success
+		}
+	}
+`;
 
-const Launches = () => {
+function Launches() {
+	const { loading, error, data } = useQuery(LAUNCHES_QUERY);
+	if (loading) return 'Loading...';
+	if (error) return `Error! ${error.message}`;
 	return (
-		<div>
-            <h2>Launches</h2>
-            <Query query={LAUNCHES_QUERY}>
-            {
-                ({loading, error, data})=> {
-                    if(loading) return <h4>Loading...</h4>
-                    if(error) console.log(error);
-                    console.log(data)
-                    return <h1>test</h1>
-
-                }
-            }
-            </Query>
-		</div>
+		<Fragment>
+			{data.launches.map((launch) => {
+				return <LaunchItem key={launch.flight_number} launch={launch} />;
+			})}
+		</Fragment>
 	);
-};
+}
 
-
-
-export default Launches
+export default Launches;
